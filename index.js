@@ -1,6 +1,12 @@
 const express = require('express');
+const { Pool } = require('pg');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL
+});
 
 app.use(express.json());
 
@@ -8,11 +14,9 @@ app.get('/', (req, res) => {
   res.json({ message: 'Railway test API is running' });
 });
 
-app.get('/notes', (req, res) => {
-  res.json([
-    { id: 1, text: 'First note' },
-    { id: 2, text: 'Second note' }
-  ]);
+app.get('/db-test', async (req, res) => {
+  const result = await pool.query('SELECT NOW()');
+  res.json({ time: result.rows[0].now });
 });
 
 app.listen(PORT, () => {
